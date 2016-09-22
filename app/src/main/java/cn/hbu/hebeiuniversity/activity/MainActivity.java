@@ -22,16 +22,12 @@ import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 import com.baidu.location.Poi;
-import com.thinkland.sdk.android.DataCallBack;
 import com.thinkland.sdk.android.JuheData;
-import com.thinkland.sdk.android.Parameters;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.List;
 
 import cn.hbu.hebeiuniversity.R;
+import cn.hbu.hebeiuniversity.utils.Weather;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -42,35 +38,29 @@ public class MainActivity extends AppCompatActivity
     private NetworkInfo mNetworkInfo;
     public BDLocationListener myListener = new MyLocationListener();
     private String address;
-    private TextView tv;
+    private TextView tv_city;
     private ImageView imageView;
+    private TextView tv_weather;
+    private TextView tv_temperature;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
+        // 初始化默认UI
+        initDefUI();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
-        View view = navigationView.getHeaderView(0);
-        imageView = (ImageView) view.findViewById(R.id.imageView);
+        // 初始化侧滑菜单栏
+        initNavigationView();
 
-        tv = (TextView) findViewById(R.id.tv);
+        // 初始化定位数据
+        initLocationData();
+    }
 
-
-
-        mLocationClient = new LocationClient(getApplicationContext());     //声明LocationClient类
-        initLocation();
-        mLocationClient.registerLocationListener( myListener );    //注册监听函数
-
+    // 初始化定位数据
+    private void initLocationData() {
         //判断是否有网络
         //获取网络状态
         mConnectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -79,11 +69,27 @@ public class MainActivity extends AppCompatActivity
             Toast.makeText(getApplicationContext(), "定位失败，请检查网络", Toast.LENGTH_SHORT).show();
         }
 
+        mLocationClient = new LocationClient(getApplicationContext());     //声明LocationClient类
+        // 初始化定位
+        initLocation();
+        mLocationClient.registerLocationListener( myListener );    //注册监听函数
+
+        // 开启定位
         mLocationClient.start();
-
-
     }
 
+    // 初始化侧滑菜单栏
+    private void initNavigationView() {
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+        View headerView = navigationView.getHeaderView(0);
+        imageView = (ImageView) headerView.findViewById(R.id.imageView);
+        tv_city = (TextView) headerView.findViewById(R.id.tv_city);
+        tv_weather = (TextView) headerView.findViewById(R.id.tv_weather);
+        tv_temperature = (TextView) headerView.findViewById(R.id.tv_temperature);
+    }
+
+    // 初始化定位
     private void initLocation(){
         LocationClientOption option = new LocationClientOption();
         option.setLocationMode(LocationClientOption.LocationMode.Hight_Accuracy
@@ -102,6 +108,7 @@ public class MainActivity extends AppCompatActivity
         mLocationClient.setLocOption(option);
     }
 
+    // 定位监听类
     public class MyLocationListener implements BDLocationListener {
         @Override
         public void onReceiveLocation(BDLocation location) {
@@ -174,158 +181,19 @@ public class MainActivity extends AppCompatActivity
                 address = address.substring(5,8);
                 Log.i(TAG,address);
             }
-            checkWeather(address);
+            // 查询天气  并更新
+            Weather.checkWeather(getApplication(), address, imageView, new Weather.WeatherCallBack() {
+                @Override
+                public void setUI(String city, String weather, String temperature) {
+                    tv_city.setText(city);
+                    tv_weather.setText(weather);
+                    tv_temperature.setText(temperature+"°C");
+                }
+            });
         }
     }
 
-    private void checkWeather(String address) {
-        Parameters params = new Parameters();
-        params.add("cityname", address);
-        params.add("dtype", "json");
-        JuheData.executeWithAPI(this, 73,
-                "http://op.juhe.cn/onebox/weather/query", JuheData.GET, params, new DataCallBack() {
-                    @Override
-                    public void onSuccess(int i, String s) {
-                        try {
-                            StringBuffer sb = new StringBuffer();
-                            JSONObject jsonObject = new JSONObject(s);
-                            Log.i(TAG,s);
-                            JSONObject result = jsonObject.getJSONObject("result");
-                            if(result != null){
-                                JSONObject data = result.getJSONObject("data");
-                                if(data != null){
-                                    JSONObject realtime = data.getJSONObject("realtime");
-                                    if(realtime != null){
-                                        // 城市
-                                        realtime.getString("city_name");
-                                        Log.i(TAG,"城市:"+realtime.getString("city_name"));
-                                        sb.append("城市:"+realtime.getString("city_name")+'\n');
-                                        // 日期
-                                        realtime.getString("date");
-                                        Log.i(TAG,"日期:"+realtime.getString("date"));
-                                        sb.append("日期:"+realtime.getString("date")+'\n');
-                                        // 更新时间
-                                        realtime.getString("time");
-                                        Log.i(TAG,"更新时间:"+realtime.getString("time"));
-                                        sb.append("更新时间:"+realtime.getString("time")+'\n');
-                                        // 星期
-                                        realtime.getString("week");
-                                        Log.i(TAG,"星期:"+realtime.getString("week"));
-                                        sb.append("星期:"+realtime.getString("week")+'\n');
-                                        // 阴历
-                                        realtime.getString("moon");
-                                        Log.i(TAG,"阴历:"+realtime.getString("moon"));
-                                        sb.append("阴历:"+realtime.getString("moon")+'\n');
-                                        // 实况天气
-                                        JSONObject weather = realtime.getJSONObject("weather");
-                                        if(weather != null){
-                                            // 温度
-                                            weather.getString("temperature");
-                                            Log.i(TAG,"温度:"+weather.getString("temperature"));
-                                            sb.append("温度:"+weather.getString("temperature")+'\n');
-                                            // 湿度
-                                            weather.getString("humidity");
-                                            Log.i(TAG,"湿度:"+weather.getString("humidity"));
-                                            sb.append("湿度:"+weather.getString("humidity")+'\n');
-                                            // 天气
-                                            weather.getString("info");
-                                            Log.i(TAG,"天气:"+weather.getString("info"));
-                                            sb.append("天气:"+weather.getString("info")+'\n');
-                                            // 图片
-                                            sb.append("图片:"+weather.getString("img")+'\n');
-                                            changeImg(weather.getString("img"));
-                                        }
-                                    }
-                                }
-                            }
-                            tv.setText(sb.toString());
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-
-                    @Override
-                    public void onFinish() {
-
-                    }
-
-                    @Override
-                    public void onFailure(int i, String s, Throwable throwable) {
-
-                    }
-                });
-    }
-
-    private void changeImg(String img) {
-        if(img.equals("00")){
-            imageView.setImageResource(R.drawable.ww0);
-        }else if(img.equals("1")){
-            imageView.setImageResource(R.drawable.ww1);
-        }else if(img.equals("2")){
-            imageView.setImageResource(R.drawable.ww2);
-        }else if(img.equals("3")){
-            imageView.setImageResource(R.drawable.ww3);
-        }else if(img.equals("4")){
-            imageView.setImageResource(R.drawable.ww4);
-        }else if(img.equals("5")){
-            imageView.setImageResource(R.drawable.ww5);
-        }else if(img.equals("6")){
-            imageView.setImageResource(R.drawable.ww6);
-        }else if(img.equals("7")){
-            imageView.setImageResource(R.drawable.ww7);
-        }else if(img.equals("8")){
-            imageView.setImageResource(R.drawable.ww8);
-        }else if(img.equals("9")){
-            imageView.setImageResource(R.drawable.ww9);
-        }else if(img.equals("10")){
-            imageView.setImageResource(R.drawable.ww10);
-        }else if(img.equals("13")){
-            imageView.setImageResource(R.drawable.ww13);
-        }else if(img.equals("14")){
-            imageView.setImageResource(R.drawable.ww14);
-        }else if(img.equals("15")){
-            imageView.setImageResource(R.drawable.ww15);
-        }else if(img.equals("16")){
-            imageView.setImageResource(R.drawable.ww16);
-        }else if(img.equals("17")){
-            imageView.setImageResource(R.drawable.ww17);
-        }else if(img.equals("18")){
-            imageView.setImageResource(R.drawable.ww18);
-        }else if(img.equals("19")){
-            imageView.setImageResource(R.drawable.ww19);
-        }else if(img.equals("20")){
-            imageView.setImageResource(R.drawable.ww20);
-        }else if(img.equals("29")){
-            imageView.setImageResource(R.drawable.ww29);
-        }else if(img.equals("30")){
-            imageView.setImageResource(R.drawable.ww30);
-        }else if(img.equals("31")){
-            imageView.setImageResource(R.drawable.ww31);
-        }else if(img.equals("32")){
-            imageView.setImageResource(R.drawable.ww32);
-        }else if(img.equals("33")){
-            imageView.setImageResource(R.drawable.ww33);
-        }else if(img.equals("34")){
-            imageView.setImageResource(R.drawable.ww34);
-        }else if(img.equals("35")){
-            imageView.setImageResource(R.drawable.ww35);
-        }else if(img.equals("36")){
-            imageView.setImageResource(R.drawable.ww36);
-        }else if(img.equals("45")){
-            imageView.setImageResource(R.drawable.ww45);
-        }
-    }
-
-    @Override
-    public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }
-    }
-
+    // 侧滑菜单点击事件
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
@@ -343,6 +211,29 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    // 返回键
+    @Override
+    public void onBackPressed() {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    // 初始化默认UI
+    private void initDefUI() {
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(toggle);
+        toggle.syncState();
     }
 
     @Override
