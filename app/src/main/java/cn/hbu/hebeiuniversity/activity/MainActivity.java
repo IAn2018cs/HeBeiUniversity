@@ -15,7 +15,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
@@ -27,11 +26,10 @@ import com.thinkland.sdk.android.JuheData;
 import java.util.List;
 
 import cn.hbu.hebeiuniversity.R;
+import cn.hbu.hebeiuniversity.utils.ToastUtli;
 import cn.hbu.hebeiuniversity.utils.Weather;
 
-public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
-
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     private static final String TAG = "MainActivity";
     private LocationClient mLocationClient;
     private ConnectivityManager mConnectivityManager;
@@ -42,7 +40,6 @@ public class MainActivity extends AppCompatActivity
     private ImageView imageView;
     private TextView tv_weather;
     private TextView tv_temperature;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,7 +63,7 @@ public class MainActivity extends AppCompatActivity
         mConnectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         mNetworkInfo = mConnectivityManager.getActiveNetworkInfo();
         if (mNetworkInfo == null) {
-            Toast.makeText(getApplicationContext(), "定位失败，请检查网络", Toast.LENGTH_SHORT).show();
+            ToastUtli.show(getApplicationContext(),"定位失败，请检查网络");
         }
 
         mLocationClient = new LocationClient(getApplicationContext());     //声明LocationClient类
