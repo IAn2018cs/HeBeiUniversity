@@ -7,6 +7,7 @@ import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.widget.LinearLayout;
 
+import cn.bmob.v3.Bmob;
 import cn.hbu.hebeiuniversity.R;
 
 /**
@@ -25,7 +26,7 @@ public class SplashActivity extends AppCompatActivity {
         setContentView(R.layout.activity_splash);
 
         //初始化后端云
-//        Bmob.initialize(this, "16b9dccf1a72e5e4c12abe733848a4d1");
+        Bmob.initialize(this, "9c955aa536a3f9154e47e4d823d04669");
 
         //初始化控件
         ll_root = (LinearLayout) findViewById(R.id.ll_root);

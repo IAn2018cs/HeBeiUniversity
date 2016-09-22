@@ -6,4 +6,5 @@ package cn.hbu.hebeiuniversity.utils;
 
 public class Constant {
 
+    public static final String GROUP_LANGUAGE_INT = "GROUP_LANGUAGE_INT";
 }
