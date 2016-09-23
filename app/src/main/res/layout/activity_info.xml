@@ -3,4 +3,14 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="18sp"
+            android:padding="8dp"
+            android:text="我们是来自15软件工程班的三名同学，我们是来自15软件工程班的三名同学，我们是来自15软件工程班的三名同学，我们是来自15软件工程班的三名同学，\n我们是来自15软件工程班的三名同学，我们是来自15软件工程班的三名同学，我们是来自15软件工程班的三名同学，我们是来自15软件工程班的三名同学，我们是来自15软件工程班的三名同学，我们是来自15软件工程班的三名同学，我们是来自15软件工程班的三名同学，我们是来自15软件工程班的三名同学，"/>
+    </ScrollView>
 </LinearLayout>

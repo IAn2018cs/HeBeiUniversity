@@ -49,6 +49,7 @@ import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.DownloadFileListener;
 import cn.bmob.v3.listener.FindListener;
 import cn.hbu.hebeiuniversity.Fragment.HomeFragment;
+import cn.hbu.hebeiuniversity.Fragment.ImageFragment;
 import cn.hbu.hebeiuniversity.Fragment.SignFragment;
 import cn.hbu.hebeiuniversity.R;
 import cn.hbu.hebeiuniversity.db.UpdateFile;
@@ -127,9 +128,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     // 设置viewpager
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        adapter.addFrag(new HomeFragment(), "主页");
+        adapter.addFrag(new HomeFragment(), "菜单");
         adapter.addFrag(new SignFragment(), "签到");
-        adapter.addFrag(new HomeFragment(), "图集");
+        adapter.addFrag(new ImageFragment(), "图集");
 
         viewPager.setAdapter(adapter);
     }
@@ -275,11 +276,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        // 语言选择
+       /* // 语言选择
         if (id == R.id.nav_language) {
-            showSingleChoiceDialog();
+            //showSingleChoiceDialog();
+        } else */
         // 关于我们
-        } else if (id == R.id.nav_info) {
+        if (id == R.id.nav_info) {
             startActivity(new Intent(this,InfoActivity.class));
         // 意见反馈
         } else if (id == R.id.nav_feedback) {
@@ -379,7 +381,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void showUpDataDialog(String description, final BmobFile bmobfile, final File file) {
         android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
         //设置对话框左上角图标
-        builder.setIcon(R.mipmap.ic_launcher);
+        builder.setIcon(R.mipmap.logo);
         //设置对话框标题
         builder.setTitle("发现新版本");
         //设置对话框内容
@@ -423,7 +425,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     // 下载的进度条对话框
     protected void showProgressDialog() {
         progressDialog = new ProgressDialog(this);
-        progressDialog.setIcon(R.mipmap.ic_launcher);
+        progressDialog.setIcon(R.mipmap.logo);
         progressDialog.setTitle("下载安装包中");
         progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
         progressDialog.show();

@@ -8,39 +8,37 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import cn.hbu.hebeiuniversity.Adapter.ListAdapter;
+import cn.hbu.hebeiuniversity.Adapter.ImageListAdapter;
 import cn.hbu.hebeiuniversity.R;
 
 public class ImageFragment extends Fragment {
 
-    private ListAdapter mAdapter;
+    private ImageListAdapter mAdapter;
 
-    private String mItemData = "Lorem Ipsum is simply dummy text of the printing and "
-            + "typesetting industry Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.";
+    private int[] idRes = {R.drawable.photo1, R.drawable.photo2, R.drawable.photo3,
+            R.drawable.photo4, R.drawable.photo5, R.drawable.photo6,
+            R.drawable.photo7, R.drawable.photo8, R.drawable.photo9,
+            R.drawable.photo10, R.drawable.photo11, R.drawable.photo12,
+            R.drawable.photo13, R.drawable.photo14, R.drawable.photo15,
+            R.drawable.photo16, R.drawable.photo17};
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_home, container, false);
+        View view = inflater.inflate(R.layout.fragment_image, container, false);
 
         RecyclerView recyclerView = (RecyclerView) view.findViewById(
                 R.id.fragment_list_rv);
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
-        recyclerView.setLayoutManager(linearLayoutManager);
-        recyclerView.setHasFixedSize(true);
+        if(recyclerView != null){
+            recyclerView.setLayoutManager(linearLayoutManager);
+            recyclerView.setHasFixedSize(true);
 
-        String[] listItems = mItemData.split(" ");
+            mAdapter = new ImageListAdapter(idRes);
+            recyclerView.setAdapter(mAdapter);
+        }
 
-        List<String> list = new ArrayList<String>();
-        Collections.addAll(list, listItems);
-
-        mAdapter = new ListAdapter(list);
-        recyclerView.setAdapter(mAdapter);
 
         return view;
     }
