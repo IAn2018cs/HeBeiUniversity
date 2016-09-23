@@ -15,9 +15,6 @@ import java.util.List;
 import cn.hbu.hebeiuniversity.Adapter.ListAdapter;
 import cn.hbu.hebeiuniversity.R;
 
-/**
- * Created by @vitovalov on 30/9/15.
- */
 public class HomeFragment extends Fragment {
 
     private ListAdapter mAdapter;
